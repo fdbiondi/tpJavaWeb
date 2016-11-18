@@ -1,0 +1,8 @@
+# Hacer una copia del archivo "config.properties.example" y nombrarlo como "config.properties" 
+# Setear los parametros de conexion correspondientes
+
+# Configuracion de conexion a DB
+
+db_name=tpjava
+user=root
+password=
