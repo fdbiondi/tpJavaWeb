@@ -2,7 +2,6 @@ package datos;
 
 import java.sql.*;
 import java.util.ArrayList;
-
 import entidades.Personaje;
 import utils.ApplicationException;
 

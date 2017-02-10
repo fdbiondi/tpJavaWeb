@@ -9,16 +9,15 @@ import java.util.Properties;
 
 import utils.*;
 
-
-
 public class FactoryConexion {
 
+	private String configPath = "com/package/props/config.properties";
 	private String dbDriver="com.mysql.jdbc.Driver";
 	private String host="localhost";
 	private String port="3306";
-	private String user;
-	private String pass;
-	private String db;
+	private String user = "root";
+	private String pass = "1454710050";
+	private String db = "tpjava";
 	private String dbType="mysql";
 	
 	private Connection conn;
@@ -37,13 +36,13 @@ public class FactoryConexion {
 	public static FactoryConexion getInstancia() throws ApplicationException{
 		if (instancia==null){
 			instancia = new FactoryConexion();
-			instancia.setAttributes();
+			//instancia.setAttributes();
 		}
 		return instancia;
 	}
 	
 	private void setAttributes() throws ApplicationException {
-		File configFile = new File("./src/config.properties"); 
+		File configFile = new File(configPath); 
 		try {
 		    FileReader reader = new FileReader(configFile);
 		    Properties props = new Properties();
