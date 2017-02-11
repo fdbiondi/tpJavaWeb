@@ -1,4 +1,5 @@
 <%@page import="entidades.Personaje"%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -27,7 +28,18 @@
 		<% 
 			Personaje p1= ((Personaje)session.getAttribute("P1"));
 			Personaje p2= ((Personaje)session.getAttribute("P2"));
-		%>
+    		int turno= (Integer)(session.getAttribute("turno"));
+    	  	String message ="";
+    	  	 
+    		boolean error = (Boolean)request.getAttribute("error");
+    		  
+    		if(error) { message = (String)request.getAttribute("message"); }
+    	 	%>
+    	  	   
+    	  	<div class="alert alert-danger" role="alert" style="<% if(!error) { %> display:none <% } %>">
+    	  		<%= message %>
+    	  	</div>
+
 		<div class="container">
 		<div class="row">
 			<div class="col-xs-6">
@@ -35,73 +47,67 @@
 			</div>
 		</div>
         	<div class="row">
-	          <form name="partida" action="round" method="post">
+	          <form name="partida" action="start" method="post">
 	            <div class="col-xs-6">
 	              <div class="form-group">
-	                <label for="jugador-1">Jugador 1:</label>
-	                <input type="text" class="form-control" name="jugador-1" value="<%= p1.getNombre() %>" readonly="readonly" disabled>
+	                <label for="jugador-1">Jugador 1</label>
+	                <input type="text" class="form-control" name="jugador-1" value="<%= p1.getNombre() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="vida-1">Vida</label>
-	                <input type="text" class="form-control"  name="vida-1" value="<%= p1.getVida() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control"  name="vida-1" value="<%= p1.getVida() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="energia-1">Energia</label>
-	                <input type="text" class="form-control" name="energia-1" value="<%= p1.getEnergia() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="energia-1" value="<%= p1.getEnergia() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="defensa-1">Defensa</label>
-	                <input type="text" class="form-control" name="defensa-1" value="<%= p1.getDefensa() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="defensa-1" value="<%= p1.getDefensa() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="evasion-1">Evasion</label>
-	                <input type="text" class="form-control" name="evasion-1" value="<%= p1.getEvasion() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="evasion-1" value="<%= p1.getEvasion() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
-	                <div class="row">
-	                  <div class="col-xs-6">
-	                    <button class="btn btn-default" name="atacar-1">Atacar</button>
-	                  </div>
-	                  <div class="col-xs-6">
-	                    <input type="text" class="form-control" name="accion-1-value" value="">
-	                  </div>
-	                </div>
+					<label for="accion-1-value">Ingresa los puntos a utilizar de ataque o pulsa defender: </label>
+					<input type="text" class="form-control" name="points_1" value="0"
+						<% if(turno != p1.getId()) {%> readonly="readonly" <% } %>>
 	              </div>
-	              <button class="btn btn-default" name="defender-1">Defender</button>
 	            </div>
 	            <div class="col-xs-6">
 	              <div class="form-group">
 	                <label for="jugador-2">Jugador 2</label>
-	                <input type="text" class="form-control" name="jugador-2" value="<%= p2.getNombre() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="jugador-2" value="<%= p2.getNombre() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="vida-2">Vida</label>
-	                <input type="text" class="form-control"  name="vida-2" value="<%= p2.getVida() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control"  name="vida-2" value="<%= p2.getVida() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="energia-2">Energia</label>
-	                <input type="text" class="form-control" name="energia-2" value="<%= p2.getEnergia() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="energia-2" value="<%= p2.getEnergia() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="defensa-2">Defensa</label>
-	                <input type="text" class="form-control" name="defensa-2" value="<%= p2.getDefensa() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="defensa-2" value="<%= p2.getDefensa() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
 	                <label for="evasion-2">Evasion</label>
-	                <input type="text" class="form-control" name="evasion-2" value="<%= p2.getEvasion() %>" readonly="readonly" disabled>
+	                <input type="text" class="form-control" name="evasion-2" value="<%= p2.getEvasion() %>" readonly="readonly">
 	              </div>
 	              <div class="form-group">
-	                <div class="row">
-	                  <div class="col-xs-6">
-	                    <button class="btn btn-default" name="atacar-2">Atacar</button>
-	                  </div>
-	                  <div class="col-xs-6">
-	                    <input type="text" class="form-control" name="accion-2-value" value="">
-	                  </div>
-	                </div>
+					<label for="accion-2-value">Ingresa los puntos a utilizar de ataque o pulsa defender: </label>
+					<input type="text" class="form-control" name="points_2" value="0" 
+						<% if(turno != p2.getId()) {%> readonly="readonly" <% } %>>
 	              </div>
-	              <button class="btn btn-default" name="defender-2">Defender</button>
 	            </div>
+	            <div class="col-xs-12">
+	            	<div class="form-group">
+                    	<button class="btn btn-default btn-block pull-left" type="submit" name="action" value="attack">Atacar</button>
+                    	<button class="btn btn-default btn-block pull-right" type="submit" name="action" value="defense">Defender</button>
+					</div>
+                </div>
 	          </form>
         	</div>
       	</div>

@@ -24,7 +24,23 @@
 </head>
 <body>
   <div class="container" style="padding-top:50px">
-  <% ArrayList<Personaje> pjs = (ArrayList<Personaje>)(request.getAttribute("pjs")); %>
+  <% ArrayList<Personaje> pjs = (ArrayList<Personaje>)(request.getAttribute("pjs")); 
+  	 boolean error = (Boolean)request.getAttribute("error");
+	 boolean finish = (Boolean)request.getAttribute("finish");
+  	 String message ="";
+  	 
+  	 if(error) { message = (String)request.getAttribute("message"); }
+  	 if(finish) { message = (String)request.getAttribute("message"); }
+ 	%>
+  	   
+  	<div class="alert alert-danger" role="alert" style="<% if(!error) { %> display:none <% } %>">
+  		<%= message %>
+  	</div>
+  
+  <div class="alert alert-success" role="alert" style="<% if(!finish) { %> display:none <% } %>">
+  		<%= message %>
+  	</div>
+  
     <form name="jugar" action="start" method="post">
 	    <div class="row">
 	      <div class="col-sm-4 col-sm-offset-1">
@@ -61,7 +77,7 @@
 	    <div class="row">
 	      <div class="col-md-4 col-md-offset-4">
 		      <div class="form-group">
-	          	<button class="btn btn-lg btn-primary btn-block" type="submit">Jugar!</button>
+	          	<button class="btn btn-lg btn-primary btn-block" name="action" value="start" type="submit">Jugar!</button>
 		      </div>
     	  </div>
 	    </div>

@@ -47,7 +47,9 @@ public class Personaje {
 	public String toString() { return this.nombre; }
 
 	// Setters
-	public void setId(int id) { this.id = id; }
+	public void setId(int id) { 
+		this.id = id;
+	}
 
 	public void setVida(int vida) { this.vida = vida; }
 	

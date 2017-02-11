@@ -26,6 +26,7 @@ public class DatosPersonaje {
 			while(rs.next()) {
 				personaje = new Personaje(rs.getString("nombre"));
 				
+				personaje.setId(id);
 				personaje.setDefensa(rs.getInt("defensa"));
 				personaje.setEnergia(rs.getInt("energia"));
 				personaje.setEvasion(rs.getInt("evasion"));

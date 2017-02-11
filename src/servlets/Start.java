@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import entidades.Personaje;
+import negocio.ControladorPartida;
 import negocio.ControladorPersonaje;
 
 /**
@@ -19,23 +20,32 @@ import negocio.ControladorPersonaje;
 @WebServlet({ "/Start", "/start" })
 public class Start extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	
+	private ControladorPersonaje ctrlPj;
+	private ControladorPartida ctrlPartida;
+
+	//private int turno;
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
     public Start() {
         super();
+        ctrlPj = new ControladorPersonaje();
+        ctrlPartida = null;
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ControladorPersonaje ctrlPj = new ControladorPersonaje();
-		
+	
+		boolean error = false; 
 		ArrayList<Personaje> pjs = ctrlPj.traerTodos();
 		request.setAttribute("pjs", pjs);
-		//request.setAttribute("message", "hello");
+		request.setAttribute("error", error);
+		request.setAttribute("finish", false);
+		
 	    RequestDispatcher view=request.getRequestDispatcher("/WEB-INF/index.jsp");
 	    view.forward(request,response);
 	}
@@ -44,14 +54,90 @@ public class Start extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ControladorPersonaje ctrlPj = new ControladorPersonaje();
+		String action = request.getParameter("action");
+		boolean error = false;
+		boolean finish = false;
+		String message = "";
 		
-		Personaje p1 = ctrlPj.traerPor(Integer.parseInt(request.getParameter("player1")));
-		Personaje p2 = ctrlPj.traerPor(Integer.parseInt(request.getParameter("player2")));
+		try {
+			if (action == null) {
+			    //no button has been selected
+				
+			} else if (action.equals("start")) {
+			    //start button was pressed		
+				if(Integer.parseInt(request.getParameter("player1")) == Integer.parseInt(request.getParameter("player2"))) {
+					throw new Exception("Los personajes no pueden competir entre ellos mismos. Por favor seleccione diferentes personajes.");
+				}
+						
+				ctrlPartida = new ControladorPartida(
+						ctrlPj.traerPor(Integer.parseInt(request.getParameter("player1"))), 
+						ctrlPj.traerPor(Integer.parseInt(request.getParameter("player2"))));
+				
+				request.getSession().setAttribute("P1", ctrlPartida.getPartida().getJugador1());
+				request.getSession().setAttribute("P2", ctrlPartida.getPartida().getJugador2());
+			
+			} else if (action.equals("attack")) {
+			    //attack button was pressed
+				int attackVal = 0;
+				try {
+					if(ctrlPartida.getTurno() == ctrlPartida.getPartida().getJugador1().getId()) {
+						
+						attackVal =	Integer.parseInt(request.getParameter("points_1"));
+					}else {
+						attackVal =	Integer.parseInt(request.getParameter("points_2"));
+					}
+				}
+				catch(Exception e) {
+					throw new Exception("Debe de ingresar un valor numerico menor a la energia disponible para poder realizar el ataque.");
+				}
+				
+				if(attackVal != 0) {
+					if(ctrlPartida.validarEnergia(attackVal)) {
+						ctrlPartida.atacar(attackVal);
+					} else {
+						throw new Exception("Energia insuficiente.");
+					}
+				}
+			} else if (action.equals("defense")) {
+				//defense button was pressed
+				ctrlPartida.defender();
+			}
+		}
+		catch(Exception e) {
+			error = true;
+			message = e.getMessage();
+		}
+
+		request.setAttribute("error", error);
 		
-		request.getSession().setAttribute("P1", p1);
-		request.getSession().setAttribute("P2", p2);
+		if(ctrlPartida != null) {
+			request.getSession().setAttribute("turno", ctrlPartida.getTurno());
+
+			finish = ctrlPartida.validaFinPartida();
+		}
+		else {
+			request.getSession().setAttribute("turno", 0);
+		}
 		
-		request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
+		if(!error) {
+			request.setAttribute("message", ctrlPartida.getPartida().mensaje);
+			request.setAttribute("finish", finish);
+			
+			if(finish){
+				request.getRequestDispatcher("WEB-INF/index.jsp").forward(request, response);
+			}else {
+				request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
+			}
+		}
+		else {
+			request.setAttribute("message", message);
+			ArrayList<Personaje> pjs = ctrlPj.traerTodos();
+			request.setAttribute("pjs", pjs);
+			
+			if(action.equals("start"))
+				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+			else
+				request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
+		}
 	}
 }
