@@ -23,8 +23,6 @@ public class Start extends HttpServlet {
 	
 	private ControladorPersonaje ctrlPj;
 	private ControladorPartida ctrlPartida;
-
-	//private int turno;
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -45,7 +43,7 @@ public class Start extends HttpServlet {
 		request.setAttribute("pjs", pjs);
 		request.setAttribute("error", error);
 		request.setAttribute("finish", false);
-		
+
 	    RequestDispatcher view=request.getRequestDispatcher("/WEB-INF/index.jsp");
 	    view.forward(request,response);
 	}
@@ -57,6 +55,7 @@ public class Start extends HttpServlet {
 		String action = request.getParameter("action");
 		boolean error = false;
 		boolean finish = false;
+		String goTo = "";
 		String message = "";
 		
 		try {
@@ -81,9 +80,8 @@ public class Start extends HttpServlet {
 				int attackVal = 0;
 				try {
 					if(ctrlPartida.getTurno() == ctrlPartida.getPartida().getJugador1().getId()) {
-						
 						attackVal =	Integer.parseInt(request.getParameter("points_1"));
-					}else {
+					} else {
 						attackVal =	Integer.parseInt(request.getParameter("points_2"));
 					}
 				}
@@ -95,7 +93,7 @@ public class Start extends HttpServlet {
 					if(ctrlPartida.validarEnergia(attackVal)) {
 						ctrlPartida.atacar(attackVal);
 					} else {
-						throw new Exception("Energia insuficiente.");
+						throw new Exception("Energia insuficiente. ");
 					}
 				}
 			} else if (action.equals("defense")) {
@@ -108,36 +106,30 @@ public class Start extends HttpServlet {
 			message = e.getMessage();
 		}
 
-		request.setAttribute("error", error);
-		
 		if(ctrlPartida != null) {
 			request.getSession().setAttribute("turno", ctrlPartida.getTurno());
-
 			finish = ctrlPartida.validaFinPartida();
+			message += ctrlPartida.getPartida().mensaje;
 		}
 		else {
 			request.getSession().setAttribute("turno", 0);
 		}
+
+		request.setAttribute("error", error);
+		request.setAttribute("message", message);
+		request.setAttribute("finish", finish);
 		
-		if(!error) {
-			request.setAttribute("message", ctrlPartida.getPartida().mensaje);
-			request.setAttribute("finish", finish);
-			
-			if(finish){
-				request.getRequestDispatcher("WEB-INF/index.jsp").forward(request, response);
-			}else {
-				request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
-			}
-		}
-		else {
-			request.setAttribute("message", message);
+		if(finish || (error && action.equals("start")))
+			goTo = "index";
+		
+		if(goTo.equals("index")) {
 			ArrayList<Personaje> pjs = ctrlPj.traerTodos();
 			request.setAttribute("pjs", pjs);
 			
-			if(action.equals("start"))
-				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
-			else
-				request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
+			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+		}
+		else {
+			request.getRequestDispatcher("WEB-INF/partida.jsp").forward(request, response);
 		}
 	}
 }

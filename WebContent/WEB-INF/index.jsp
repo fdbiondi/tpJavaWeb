@@ -29,9 +29,8 @@
 	 boolean finish = (Boolean)request.getAttribute("finish");
   	 String message ="";
   	 
-  	 if(error) { message = (String)request.getAttribute("message"); }
-  	 if(finish) { message = (String)request.getAttribute("message"); }
- 	%>
+  	 if(error || finish) { message = (String)request.getAttribute("message"); }
+  	 %>
   	   
   	<div class="alert alert-danger" role="alert" style="<% if(!error) { %> display:none <% } %>">
   		<%= message %>
